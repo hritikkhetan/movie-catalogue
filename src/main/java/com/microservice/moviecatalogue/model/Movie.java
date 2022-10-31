@@ -11,13 +11,23 @@ import lombok.Data;
 @Data
 public class Movie {
 
+	public Movie(String movieId, String movie, String description) {
+		this.movieId = movieId;
+		this.movie = movie;
+		this.description = description;
+	}
+	
+	public Movie() {
+		
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private String movieId;
 	
-	private String movieName;
+	private String movie;
 	
 	private String description;
 }

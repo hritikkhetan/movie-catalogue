@@ -14,6 +14,12 @@ public class UserRating {
 	public UserRating() {
 
 	}
+	
+	public UserRating(String userId, String movieId, Integer rating) {
+		this.userId = userId;
+		this.movieId = movieId;
+		this.rating = rating;
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +29,6 @@ public class UserRating {
 	
 	public String movieId;
 	
-	public Float rating;
+	public Integer rating;
 	
 }
