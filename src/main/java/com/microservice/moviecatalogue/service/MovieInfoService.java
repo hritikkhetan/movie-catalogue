@@ -12,19 +12,22 @@ public class MovieInfoService {
 
 	@Autowired
 	private WebClient.Builder webClientBuilder;
-	
+
+//	@Autowired
+//	private RestTemplate restTemplate;
+
 	@HystrixCommand(fallbackMethod = "getFallbackMovieInfo")
 	public Movie getMovieInfo(String movieId) {
 		Movie movie = webClientBuilder.build().get()
 				.uri("http://movie-info-service/movie/" + movieId).retrieve()
 				.bodyToMono(Movie.class).block();
 
-		// Movie movie = restTemplate.getForObject("http://movie-info-service/movie/" + userRating.getMovieId() , Movie.class);
+		//Movie movie = restTemplate.getForObject("http://movie-info-service/movie/" + movieId, Movie.class);
 		return movie;
 	}
-	
+
 	public Movie getFallbackMovieInfo(String movieId) {
 		return new Movie(movieId, "movie not available", "movie description not available");
 	}
-	
+
 }
