@@ -19,21 +19,33 @@ import com.microservice.moviecatalogue.service.MovieInfoService;
 import com.microservice.moviecatalogue.service.RatingDataService;
 import com.microservice.moviecatalogue.wrapper.CreateUserRequest;
 import com.microservice.moviecatalogue.wrapper.GetUserRatingResponse;
-import com.microservice.moviecatalogue.wrapper.MovieCatalogueRatingByUserResponse;
+import com.microservice.moviecatalogue.wrapper.MovieCatalogueByUserResponse;
 import com.microservice.moviecatalogue.wrapper.MovieDetailRating;
 
+/**
+ * MovieCatalogueController class to control and process the request by the user
+ * @author hritik.khetan
+ *
+ */
 @RestController
 public class MovieCatalogueController {
 
 	@Autowired
 	private UserDaoRepository userDaoRepository;
-	
+
 	@Autowired
 	private RatingDataService ratingDataService;
-	
+
 	@Autowired
 	private MovieInfoService movieInfoService;
 
+	/**
+	 * createUser method is used to create the user of the movie-catalog application
+	 * 
+	 * @author hritik.khetan
+	 * @param createUserRequest
+	 * @return user: newly created user
+	 */
 	@PostMapping(value = "/user")
 	public @ResponseBody User createUser(@RequestBody CreateUserRequest createUserRequest) {
 
@@ -46,44 +58,64 @@ public class MovieCatalogueController {
 		return user;
 	}
 
+	/**
+	 * getAllUsers method is used to fetch all the records of the user.
+	 * 
+	 * @author hritik.khetan
+	 * @return list of all the users
+	 */
 	@GetMapping(value = "/users")
-	public @ResponseBody List<User> getUsers() {
+	public @ResponseBody List<User> getAllUsers() {
 		return userDaoRepository.findAll();
 	}
 
+	/**
+	 * getUserById method is used to fetch the record of the particular user by id.
+	 * 
+	 * @author hritik.khetan
+	 * @param id: id of the user
+	 * @return user by id
+	 */
 	@GetMapping(value = "/user/{id}")
 	public @ResponseBody User getUserById(@PathVariable Long id) {
 		return userDaoRepository.findById(id).orElse(null);
 	}
 
+	/**
+	 * getMovieCatalogueByUser method is to fetch the movie information along with the rating for particular user.
+	 * 
+	 * @author hritik.khetan
+	 * @param userId: unique userId of the user
+	 * @return
+	 */
 	@GetMapping(value = "/user/{userId}/movies")
-	public @ResponseBody MovieCatalogueRatingByUserResponse getMovieCatalogueRatingByUser(@PathVariable String userId) {
+	public @ResponseBody MovieCatalogueByUserResponse getMovieCatalogueByUser(@PathVariable String userId) {
 
 		final User user = userDaoRepository.findByUserId(userId);
 
 		// Creating response object
-		MovieCatalogueRatingByUserResponse movieCatalogueRatingByUserResponse = new MovieCatalogueRatingByUserResponse();
-		movieCatalogueRatingByUserResponse.setUserId(user.getUserId());
-		movieCatalogueRatingByUserResponse.setName(user.getName());
+		MovieCatalogueByUserResponse movieCatalogueByUserResponse = new MovieCatalogueByUserResponse();
+		movieCatalogueByUserResponse.setUserId(user.getUserId());
+		movieCatalogueByUserResponse.setName(user.getName());
 		List<MovieDetailRating> movieDetailRatingList = new ArrayList<>();
 
 		// Calling rating-data microservice to fetch the all the ratings the user has
 		// given to the movies.
 		GetUserRatingResponse getUserRatingResponse = ratingDataService.getUserRating(user.getUserId());
 
-
 		for (UserRating userRating : getUserRatingResponse.getUserRatingList()) {
 
 			// Calling movie-info ms to fetch the movie information
 			Movie movie = movieInfoService.getMovieInfo(userRating.getMovieId());
 
-			MovieDetailRating movieDetailRating = new MovieDetailRating(movie.getMovie(), movie.getDescription(), userRating.getRating());
+			MovieDetailRating movieDetailRating = new MovieDetailRating(movie.getMovie(), movie.getDescription(),
+					userRating.getRating());
 			movieDetailRatingList.add(movieDetailRating);
 		}
 
-		movieCatalogueRatingByUserResponse.setMovieDetailRating(movieDetailRatingList);
+		movieCatalogueByUserResponse.setMovieDetailRating(movieDetailRatingList);
 
-		return movieCatalogueRatingByUserResponse;
+		return movieCatalogueByUserResponse;
 	}
 
 }
