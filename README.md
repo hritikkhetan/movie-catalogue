@@ -1,4 +1,5 @@
 # movie-catalogue
+
 #spring-boot application
 #Enabled EurekaClient and CircuitBreaker
 #Stores the user information.
